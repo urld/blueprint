@@ -27,9 +27,9 @@ digraph "Test Title" {
 
 func TestGenDot(t *testing.T) {
 
-	n := []node{node{Name: "N1", Attrs: map[string]string{"label": "N1 Label", "style": "filled"}},
-		node{Name: "N2", Attrs: map[string]string{}}}
-	e := []edge{edge{Source: "N1", Destination: "N2", Attrs: map[string]string{"label": "1-2 Label"}}}
+	n := []node{{Name: "N1", Attrs: map[string]string{"label": "N1 Label", "style": "filled"}},
+		{Name: "N2", Attrs: map[string]string{}}}
+	e := []edge{{Source: "N1", Destination: "N2", Attrs: map[string]string{"label": "1-2 Label"}}}
 	g := graph{Title: "Test Title", Nodes: n, Edges: e}
 
 	buf := new(bytes.Buffer)
