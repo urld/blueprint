@@ -13,7 +13,7 @@ import (
 const expectedGenDot = `
 digraph "Test Title" {
 	ranksep="1.5 equally";
-	splines="polyline";
+	nodesep="1.5 equally";
 	node[fontcolor="white" fontsize=11 fontname="Sans" shape="box" style="filled,rounded" margin="0.20,0.20"];
 	edge[fontcolor="dimgrey" color="dimgrey" fontsize=11 fontname="Sans"];
 

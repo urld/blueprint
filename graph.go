@@ -32,7 +32,7 @@ const (
 const dotTemplate = `
 digraph "{{.Title}}" {
 	ranksep="1.5 equally";
-	splines="polyline";
+	nodesep="1.5 equally";
 	node[fontcolor="white" fontsize=11 fontname="Sans" shape="box" style="filled,rounded" margin="0.20,0.20"];
 	edge[fontcolor="dimgrey" color="dimgrey" fontsize=11 fontname="Sans"];
 
@@ -136,7 +136,7 @@ func personaNode(p Persona) node {
 
 func relationshipEdge(r Relationship) edge {
 	attrs := map[string]string{
-		"label": WrapWords(r.Description, lineSep, lineLimit) + edgeTechnology(r),
+		"label": "<TABLE BORDER=\"0\"><TR><TD>" + WrapWords(r.Description, lineSep, lineLimit) + edgeTechnology(r) + "</TD></TR></TABLE>",
 	}
 	return edge{Source: r.Source, Destination: r.Destination, Attrs: attrs}
 }
