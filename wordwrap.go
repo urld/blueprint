@@ -15,12 +15,13 @@ func WrapWords(text string, lineSep string, limit int) string {
 	var buf bytes.Buffer
 	remaining := limit
 	for i, word := range words {
-		if i == 0 {
+		switch {
+		case i == 0:
 			// first word is special
-		} else if len(word)+1 > remaining {
+		case len(word)+1 > remaining:
 			buf.WriteString(lineSep)
 			remaining = limit
-		} else {
+		default:
 			buf.WriteRune(' ')
 			remaining--
 		}

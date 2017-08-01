@@ -73,13 +73,9 @@ func parseFile(path string, m *Model) error {
 		key := strings.TrimSpace(line[:i])
 		value := strings.TrimSpace(line[i+1:])
 		switch key {
-		case "Person":
-			fallthrough
-		case "Persona":
+		case "Persona", "Person":
 			parsePersona(m, path, lineno, value)
-		case "SoftwareSystem":
-			fallthrough
-		case "System":
+		case "System", "SoftwareSystem":
 			parseSystem(m, path, lineno, value)
 		case "Container":
 			parseContainer(m, path, lineno, value)
