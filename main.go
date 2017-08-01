@@ -72,5 +72,11 @@ func systemContextView(m Model) View {
 		personas = append(personas, k)
 	}
 
-	return SystemContextView{title: "System Context Diagram", description: "The complete system context diagram, containing all systems of the current project.", Systems: systems, Personas: personas}
+	return SystemContextView{
+		title:       "System Context Diagram",
+		description: "The complete system context diagram, containing all systems of the current project.",
+		CoreSystems: systems,
+		Systems:     systems,
+		Personas:    personas,
+	}
 }

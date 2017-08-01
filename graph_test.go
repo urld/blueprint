@@ -17,11 +17,18 @@ digraph "Test Title" {
 	node[fontcolor="white" fontsize=11 fontname="Sans" shape="box" style="filled,rounded" margin="0.20,0.20"];
 	edge[fontcolor="dimgrey" color="dimgrey" fontsize=11 fontname="Sans"];
 
-	"N1" [ label=<N1 Label> style=<filled> ];
-	"N2" [ ];
-	
+	subgraph cluster_core {
+		color="#7b7b7b";
+		style="dashed,rounded,bold";
+		"N1" [ label=<N1 Label> style=<filled> ];
+		"N2" [ ];
+	}
+
+	// other nodes:
+	"N3" [ label=<N3 Label> ];
+
+	// relationships
 	"N1" -> "N2" [ label=<1-2 Label> ];
-	
 }
 `
 
@@ -29,8 +36,9 @@ func TestGenDot(t *testing.T) {
 
 	n := []node{{Name: "N1", Attrs: map[string]string{"label": "N1 Label", "style": "filled"}},
 		{Name: "N2", Attrs: map[string]string{}}}
+	en := []node{{Name: "N3", Attrs: map[string]string{"label": "N3 Label"}}}
 	e := []edge{{Source: "N1", Destination: "N2", Attrs: map[string]string{"label": "1-2 Label"}}}
-	g := graph{Title: "Test Title", Nodes: n, Edges: e}
+	g := graph{Title: "Test Title", CoreNodes: n, ExternalNodes: en, Edges: e}
 
 	buf := new(bytes.Buffer)
 	genDot(buf, g)

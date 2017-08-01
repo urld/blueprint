@@ -16,6 +16,7 @@ type View interface {
 type SystemContextView struct {
 	title       string
 	description string
+	CoreSystems []string
 	Systems     []string
 	Personas    []string
 }

@@ -11,4 +11,4 @@ Relationship = Moderator | Reviews content | | example.com Blog |
 
 System = Hackernews | |
 
-Relationship = example.com Blog | Share relevant articles with news aggregator | | Hackernews |
+Relationship = example.com Blog | Share relevant articles with news aggregator | HTTP/REST | Hackernews |

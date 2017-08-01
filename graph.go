@@ -36,19 +36,31 @@ digraph "{{.Title}}" {
 	node[fontcolor="white" fontsize=11 fontname="Sans" shape="box" style="filled,rounded" margin="0.20,0.20"];
 	edge[fontcolor="dimgrey" color="dimgrey" fontsize=11 fontname="Sans"];
 
-	{{range .Nodes -}}
+	subgraph cluster_core {
+		color="#7b7b7b";
+		style="dashed,rounded,bold";
+		{{- range .CoreNodes}}
 		"{{.Name}}" [{{range $k, $v := .Attrs}} {{$k}}=<{{$v}}>{{end}} ];
-	{{end}}
-	{{range .Edges -}}
-		"{{.Source}}" -> "{{.Destination}}" [{{range $k, $v := .Attrs}} {{$k}}=<{{$v}}>{{end}} ];
-	{{end}}
+		{{- end}}
+	}
+
+	// other nodes:
+	{{- range .ExternalNodes}}
+	"{{.Name}}" [{{range $k, $v := .Attrs}} {{$k}}=<{{$v}}>{{end}} ];
+	{{- end}}
+
+	// relationships
+	{{- range .Edges}}
+	"{{.Source}}" -> "{{.Destination}}" [{{range $k, $v := .Attrs}} {{$k}}=<{{$v}}>{{end}} ];
+	{{- end}}
 }
 `
 
 type graph struct {
-	Title string
-	Nodes []node
-	Edges []edge
+	Title         string
+	CoreNodes     []node
+	ExternalNodes []node
+	Edges         []edge
 }
 
 type node struct {
@@ -124,9 +136,16 @@ func personaNode(p Persona) node {
 
 func relationshipEdge(r Relationship) edge {
 	attrs := map[string]string{
-		"label": WrapWords(r.Description, lineSep, lineLimit),
+		"label": WrapWords(r.Description, lineSep, lineLimit) + edgeTechnology(r),
 	}
 	return edge{Source: r.Source, Destination: r.Destination, Attrs: attrs}
+}
+
+func edgeTechnology(r Relationship) string {
+	if len(r.Technology) == 0 {
+		return ""
+	}
+	return "<BR/>[" + WrapWords(r.Technology, lineSep, lineLimit) + "]"
 }
 
 func relationshipEdges(rs ...Relationship) []edge {
@@ -138,7 +157,8 @@ func relationshipEdges(rs ...Relationship) []edge {
 }
 
 func (v SystemContextView) Dot(w io.Writer, model Model) error {
-	nodes := make([]node, 0)
+	coreNodes := make([]node, 0)
+	extNodes := make([]node, 0)
 	edges := make([]edge, 0)
 
 	for _, name := range v.Systems {
@@ -147,7 +167,7 @@ func (v SystemContextView) Dot(w io.Writer, model Model) error {
 			// TODO: is this an error?
 			continue
 		}
-		nodes = append(nodes, systemNode(sys))
+		coreNodes = append(coreNodes, systemNode(sys))
 		edges = append(edges, relationshipEdges(model.Relationships(name)...)...)
 	}
 
@@ -157,11 +177,11 @@ func (v SystemContextView) Dot(w io.Writer, model Model) error {
 			// TODO: is this an error?
 			continue
 		}
-		nodes = append(nodes, personaNode(pers))
+		extNodes = append(extNodes, personaNode(pers))
 		edges = append(edges, relationshipEdges(model.Relationships(name)...)...)
 	}
 
-	return genDot(w, graph{Title: v.title, Nodes: nodes, Edges: edges})
+	return genDot(w, graph{Title: v.title, CoreNodes: coreNodes, ExternalNodes: extNodes, Edges: edges})
 }
 
 func genDot(w io.Writer, g graph) error {
