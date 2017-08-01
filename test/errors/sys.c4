@@ -1,0 +1,15 @@
+
+Persona = Author | Someone who publishes is own articles on the blog. |
+Persona = Reader | Someone who reads articles on the blog. | | additional element
+Persona = Moderator | An administrator who manages inapropriate content. |
+
+System = example.com Blog | An innovative blog. Everyone can publish their articles. |
+
+Relationship = Author | Publishes Articles | | example.com Blog |
+Relationship = Reader | Reads Articles | | example.com Blog | | extra element
+Relationship = Moderator | Reviews content | | example.com Blog |
+
+System = Hackernews | |
+
+Relationship = example.com Blog | Share relevant articles with news aggregator | | Hackernews |
+Relationship = example.com Blog | Erroneus Relationship | | Non Existant Destination |

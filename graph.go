@@ -6,9 +6,12 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
+	"strings"
 	"text/template"
 )
 
@@ -66,7 +69,7 @@ func renderGraph(w io.Writer, view View, model Model) error {
 		return err
 	}
 	out, err := cmd.StdoutPipe()
-	cmd.Stderr = os.Stderr
+	errPipe, err := cmd.StderrPipe()
 	err = cmd.Start()
 	if err != nil {
 		return err
@@ -82,9 +85,19 @@ func renderGraph(w io.Writer, view View, model Model) error {
 	if err != nil {
 		return err
 	}
-	err = cmd.Wait()
+
+	errBuf := new(bytes.Buffer)
+	_, err = io.Copy(errBuf, errPipe)
 	if err != nil {
 		return err
+	}
+
+	err = cmd.Wait()
+	if err != nil {
+		return fmt.Errorf(strings.Join([]string{err.Error(), errBuf.String()}, "\n"))
+	}
+	if errBuf.Len() > 0 {
+		return fmt.Errorf(errBuf.String())
 	}
 	return nil
 }

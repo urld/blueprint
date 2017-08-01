@@ -8,7 +8,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -73,10 +72,5 @@ func systemContextView(m Model) View {
 		personas = append(personas, k)
 	}
 
-	return SystemContextView{title: "System Context Diagram", Systems: systems, Personas: personas}
-}
-
-func renderPage(w io.Writer, view View, model Model) error {
-	// TODO: wrap svg in nice html
-	return renderGraph(w, view, model)
+	return SystemContextView{title: "System Context Diagram", description: "The complete system context diagram, containing all systems of the current project.", Systems: systems, Personas: personas}
 }
