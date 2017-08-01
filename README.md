@@ -1,5 +1,6 @@
 # blueprint
 
+[![Build Status](https://travis-ci.org/urld/blueprint.svg?branch=master)](https://travis-ci.org/urld/blueprint)
 [![Go Report Card](https://goreportcard.com/badge/github.com/urld/blueprint)](https://goreportcard.com/report/github.com/urld/blueprint)
 [![GoDoc](https://godoc.org/github.com/urld/blueprint?status.svg)](https://godoc.org/github.com/urld/blueprint)
 
