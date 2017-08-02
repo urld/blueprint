@@ -19,9 +19,9 @@ func TestParseSystem(t *testing.T) {
 
 	parseSystem(m, path, lineno, value)
 
-	assertEqual(t, 0, len(m.errors), "0 errors expected")
-	assertEqual(t, 1, len(m.systems), "1 system expected")
-	sys := m.systems["Test System"]
+	assertEqual(t, 0, len(m.Errors), "0 errors expected")
+	assertEqual(t, 1, len(m.Systems), "1 system expected")
+	sys := m.Systems["Test System"]
 	expectedSys := System{Name: "Test System", Description: "Test Description", Tags: []string{"tag1", "tag2"}}
 	assertEqual(t, sys, expectedSys, "system content does not match")
 }
@@ -33,11 +33,11 @@ func TestParseSystemMissingElemet(t *testing.T) {
 
 	parseSystem(m, path, 1, value)
 
-	assertEqual(t, 1, len(m.errors), "1 error expected")
+	assertEqual(t, 1, len(m.Errors), "1 error expected")
 	expectedErr := ParseError{File: path, Line: 1, Msg: "System requires 3 elements: Name | Description | Tags"}
-	assertEqual(t, expectedErr, m.errors[0], "error does not match")
+	assertEqual(t, expectedErr, m.Errors[0], "error does not match")
 
-	assertEqual(t, 0, len(m.systems), "0 systems expected")
+	assertEqual(t, 0, len(m.Systems), "0 systems expected")
 }
 
 func TestParseSystemDuplicate(t *testing.T) {
@@ -48,12 +48,12 @@ func TestParseSystemDuplicate(t *testing.T) {
 	parseSystem(m, path, 1, value)
 	parseSystem(m, path, 2, value)
 
-	assertEqual(t, 1, len(m.errors), "1 error expected")
+	assertEqual(t, 1, len(m.Errors), "1 error expected")
 	expectedErr := ParseError{File: path, Line: 2, Msg: "System is already defined: Test System"}
-	assertEqual(t, expectedErr, m.errors[0], "error does not match")
+	assertEqual(t, expectedErr, m.Errors[0], "error does not match")
 
-	assertEqual(t, 1, len(m.systems), "1 system expected")
-	sys := m.systems["Test System"]
+	assertEqual(t, 1, len(m.Systems), "1 system expected")
+	sys := m.Systems["Test System"]
 	expectedSys := System{Name: "Test System", Description: "Test Description", Tags: []string{"tag1", "tag2"}}
 	assertEqual(t, sys, expectedSys, "system content does not match")
 }
