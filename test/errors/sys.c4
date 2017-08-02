@@ -13,3 +13,5 @@ System = Hackernews | |
 
 Relationship = example.com Blog | Share relevant articles with news aggregator | HTTP/REST | Hackernews |
 Relationship = example.com Blog | Erroneus Relationship | | Non Existant Destination |
+
+SomethingElse = foo | bar

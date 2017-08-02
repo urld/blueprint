@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"net/url"
 	"os"
 	"os/exec"
 	"strings"
@@ -120,8 +121,20 @@ func systemNode(s System) node {
 			WrapWords(s.Description, lineSep, lineLimit),
 		"fillcolor": systemColor,
 		"color":     systemBorderColor,
+		"URL":       "../" + url.PathEscape(s.Name) + "?view=container",
 	}
 	return node{Name: s.Name, Attrs: attrs}
+}
+
+func containerNode(c Container) node {
+	attrs := map[string]string{
+		"label": "<FONT POINT-SIZE=\"14\"><B>" + c.Name + "</B></FONT><BR/>[Container]<BR/><BR/>" +
+			WrapWords(c.Description, lineSep, lineLimit),
+		"fillcolor": containerColor,
+		"color":     containerBorderColor,
+		"URL":       "../" + url.PathEscape(c.Name) + "?view=container",
+	}
+	return node{Name: c.Name, Attrs: attrs}
 }
 
 func personaNode(p Persona) node {
@@ -156,10 +169,21 @@ func relationshipEdges(rs ...Relationship) []edge {
 	return edges
 }
 
-func (v SystemContextView) Dot(w io.Writer, model Model) error {
+func (v ContainerView) Dot(w io.Writer, model Model) error {
 	coreNodes := make([]node, 0)
 	extNodes := make([]node, 0)
 	edges := make([]edge, 0)
+	fmt.Println(v)
+
+	for _, name := range v.Containers {
+		cont, ok := model.containers[name]
+		if !ok {
+			// TODO: is this an error?
+			continue
+		}
+		coreNodes = append(coreNodes, containerNode(cont))
+		edges = append(edges, relationshipEdges(model.Relationships(name)...)...)
+	}
 
 	for _, name := range v.Systems {
 		sys, ok := model.systems[name]
@@ -167,7 +191,45 @@ func (v SystemContextView) Dot(w io.Writer, model Model) error {
 			// TODO: is this an error?
 			continue
 		}
+		extNodes = append(extNodes, systemNode(sys))
+		edges = append(edges, relationshipEdges(model.Relationships(name)...)...)
+	}
+
+	for _, name := range v.Personas {
+		pers, ok := model.personas[name]
+		if !ok {
+			// TODO: is this an error?
+			continue
+		}
+		extNodes = append(extNodes, personaNode(pers))
+		edges = append(edges, relationshipEdges(model.Relationships(name)...)...)
+	}
+
+	return genDot(w, graph{Title: v.title, CoreNodes: coreNodes, ExternalNodes: extNodes, Edges: edges})
+}
+
+func (v SystemContextView) Dot(w io.Writer, model Model) error {
+	coreNodes := make([]node, 0)
+	extNodes := make([]node, 0)
+	edges := make([]edge, 0)
+
+	for _, name := range v.CoreSystems {
+		sys, ok := model.systems[name]
+		if !ok {
+			// TODO: is this an error?
+			continue
+		}
 		coreNodes = append(coreNodes, systemNode(sys))
+		edges = append(edges, relationshipEdges(model.Relationships(name)...)...)
+	}
+
+	for _, name := range v.ExternalSystems {
+		sys, ok := model.systems[name]
+		if !ok {
+			// TODO: is this an error?
+			continue
+		}
+		extNodes = append(extNodes, systemNode(sys))
 		edges = append(edges, relationshipEdges(model.Relationships(name)...)...)
 	}
 

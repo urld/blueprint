@@ -12,3 +12,5 @@ Relationship = Moderator | Reviews content | | example.com Blog |
 System = Hackernews | |
 
 Relationship = example.com Blog | Share relevant articles with news aggregator | HTTP/REST | Hackernews |
+
+SystemContext = example.com Blog | Hackernews | example.com System | A complete system context diagram of the example.com Blogging System

@@ -6,18 +6,39 @@
 package main
 
 type Model struct {
-	personas      map[string]Persona
-	systems       map[string]System
-	containers    map[string]Container
-	components    map[string]Component
-	relationships []Relationship
-	errors        []error
+	personas       map[string]Persona
+	systemContexts map[string]SystemContext
+	systems        map[string]System
+	containers     map[string]Container
+	components     map[string]Component
+	relationships  []Relationship
+	views          map[string]View
+	errors         []error
+}
+
+func newModel() *Model {
+	m := new(Model)
+	m.personas = make(map[string]Persona)
+	m.systemContexts = make(map[string]SystemContext)
+	m.systems = make(map[string]System)
+	m.containers = make(map[string]Container)
+	m.components = make(map[string]Component)
+	m.relationships = make([]Relationship, 0)
+	m.errors = make([]error, 0)
+	return m
 }
 
 type Persona struct {
 	Name        string
 	Description string
 	Tags        []string
+}
+
+type SystemContext struct {
+	Name            string
+	Description     string
+	CoreSystems     []string
+	ExternalSystems []string
 }
 
 type System struct {

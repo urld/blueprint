@@ -23,17 +23,6 @@ func (e ParseError) Error() string {
 	return fmt.Sprintf("%s:%d: %s", e.File, e.Line, e.Msg)
 }
 
-func newModel() *Model {
-	m := new(Model)
-	m.personas = make(map[string]Persona)
-	m.systems = make(map[string]System)
-	m.containers = make(map[string]Container)
-	m.components = make(map[string]Component)
-	m.relationships = make([]Relationship, 0)
-	m.errors = make([]error, 0)
-	return m
-}
-
 func Parse(path string) (Model, error) {
 	m := newModel()
 	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
@@ -83,7 +72,10 @@ func parseFile(path string, m *Model) error {
 			parseComponent(m, path, lineno, value)
 		case "Relationship":
 			parseRelationship(m, path, lineno, value)
+		case "SystemContext":
+			parseSystemContext(m, path, lineno, value)
 		default:
+			addErr(m, path, lineno, "unknown keyword: "+key)
 		}
 
 	}
@@ -197,6 +189,50 @@ func parseRelationship(m *Model, path string, lineno int, value string) {
 
 	m.relationships = append(m.relationships,
 		Relationship{Source: source, Description: description, Technology: technology, Destination: destination, Tags: tags})
+}
+
+func parseSystemContext(m *Model, path string, lineno int, value string) {
+	fields := strings.Split(value, "|")
+	if len(fields) < 4 {
+		addErr(m, path, lineno, "SystemContext requires 4 elements: CoreSystems | ExternalSystems | Name | Description")
+		return
+	}
+	if len(fields) > 4 {
+		addErr(m, path, lineno, "SystemContext requires 4 elements: CoreSystems | ExternalSystems | Name | Description")
+	}
+
+	coreSys := parseTags(fields[0])
+	extSys := parseTags(fields[1])
+	name := strings.TrimSpace(fields[2])
+	description := strings.TrimSpace(fields[3])
+
+	if _, ok := m.views[name]; ok {
+		addErr(m, path, lineno, "View is already defined: "+name)
+		return
+	}
+	m.systemContexts[name] = SystemContext{Name: name, Description: description, CoreSystems: coreSys, ExternalSystems: extSys}
+}
+
+func parseContainerView(m *Model, path string, lineno int, value string) {
+	fields := strings.Split(value, "|")
+	if len(fields) < 4 {
+		addErr(m, path, lineno, "SystemContextView requires 4 elements: CoreSystems | ExternalSystems | Title | Description")
+		return
+	}
+	if len(fields) > 4 {
+		addErr(m, path, lineno, "SystemContextView requires 4 elements: CoreSystems | ExternalSystems | Title | Description")
+	}
+
+	coreSys := parseTags(fields[0])
+	extSys := parseTags(fields[1])
+	title := strings.TrimSpace(fields[2])
+	description := strings.TrimSpace(fields[3])
+
+	if _, ok := m.views[title]; ok {
+		addErr(m, path, lineno, "View is already defined: "+title)
+		return
+	}
+	m.views[title] = SystemContextView{title: title, description: description, CoreSystems: coreSys, ExternalSystems: extSys}
 }
 
 func parseTags(s string) []string {

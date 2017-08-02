@@ -14,11 +14,11 @@ type View interface {
 }
 
 type SystemContextView struct {
-	title       string
-	description string
-	CoreSystems []string
-	Systems     []string
-	Personas    []string
+	title           string
+	description     string
+	CoreSystems     []string
+	ExternalSystems []string
+	Personas        []string
 }
 
 func (v SystemContextView) Description() string {
@@ -30,17 +30,25 @@ func (v SystemContextView) Title() string {
 }
 
 type ContainerView struct {
-	Title       string
-	Description string
+	title       string
+	description string
 	System      string
 	Containers  []string
 	Systems     []string
 	Personas    []string
 }
 
+func (v ContainerView) Description() string {
+	return v.description
+}
+
+func (v ContainerView) Title() string {
+	return v.title
+}
+
 type ComponentView struct {
-	Title       string
-	Description string
+	title       string
+	description string
 	Container   string
 	Components  []string
 	Containers  []string
