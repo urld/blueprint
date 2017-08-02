@@ -3,14 +3,14 @@
 // GNU General Public License Version 2
 // which can be found in the LICENSE file.
 
-package main
+package blueprint
 
 import (
 	"bytes"
 	"strings"
 )
 
-func WrapWords(text string, lineSep string, limit int) string {
+func wrapWords(text string, limit int) string {
 	words := strings.Fields(text)
 	var buf bytes.Buffer
 	remaining := limit
@@ -19,7 +19,7 @@ func WrapWords(text string, lineSep string, limit int) string {
 		case i == 0:
 			// first word is special
 		case len(word)+1 > remaining:
-			buf.WriteString(lineSep)
+			buf.WriteString("<BR/>")
 			remaining = limit
 		default:
 			buf.WriteRune(' ')

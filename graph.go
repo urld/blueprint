@@ -3,7 +3,7 @@
 // GNU General Public License Version 2
 // which can be found in the LICENSE file.
 
-package main
+package blueprint
 
 import (
 	"bytes"
@@ -26,7 +26,6 @@ const (
 	componentColor       = "#3d88d1"
 	componentBorderColor = "#1782cc"
 
-	lineSep   = "<BR/>"
 	lineLimit = 38
 )
 
@@ -118,7 +117,7 @@ func renderGraph(w io.Writer, view View, model Model) error {
 func systemNode(s System) node {
 	attrs := map[string]string{
 		"label": "<FONT POINT-SIZE=\"14\"><B>" + s.Name + "</B></FONT><BR/>[System]<BR/><BR/>" +
-			WrapWords(s.Description, lineSep, lineLimit),
+			wrapWords(s.Description, lineLimit),
 		"fillcolor": systemColor,
 		"color":     systemBorderColor,
 		"URL":       "../" + url.PathEscape(s.Name) + "?view=container",
@@ -129,7 +128,7 @@ func systemNode(s System) node {
 func containerNode(c Container) node {
 	attrs := map[string]string{
 		"label": "<FONT POINT-SIZE=\"14\"><B>" + c.Name + "</B></FONT><BR/>[Container]<BR/><BR/>" +
-			WrapWords(c.Description, lineSep, lineLimit),
+			wrapWords(c.Description, lineLimit),
 		"fillcolor": containerColor,
 		"color":     containerBorderColor,
 		"URL":       "../" + url.PathEscape(c.Name) + "?view=container",
@@ -140,7 +139,7 @@ func containerNode(c Container) node {
 func personaNode(p Persona) node {
 	attrs := map[string]string{
 		"label": "<FONT POINT-SIZE=\"14\"><B>" + p.Name + "</B></FONT><BR/>[Person]<BR/><BR/>" +
-			WrapWords(p.Description, lineSep, lineLimit),
+			wrapWords(p.Description, lineLimit),
 		"fillcolor": personColor,
 		"color":     personBorderColor,
 	}
@@ -149,7 +148,7 @@ func personaNode(p Persona) node {
 
 func relationshipEdge(r Relationship) edge {
 	attrs := map[string]string{
-		"label": "<TABLE BORDER=\"0\"><TR><TD>" + WrapWords(r.Description, lineSep, lineLimit) + edgeTechnology(r) + "</TD></TR></TABLE>",
+		"label": "<TABLE BORDER=\"0\"><TR><TD>" + wrapWords(r.Description, lineLimit) + edgeTechnology(r) + "</TD></TR></TABLE>",
 	}
 	return edge{Source: r.Source, Destination: r.Destination, Attrs: attrs}
 }
@@ -158,7 +157,7 @@ func edgeTechnology(r Relationship) string {
 	if len(r.Technology) == 0 {
 		return ""
 	}
-	return "<BR/>[" + WrapWords(r.Technology, lineSep, lineLimit) + "]"
+	return "<BR/>[" + wrapWords(r.Technology, lineLimit) + "]"
 }
 
 func relationshipEdges(rs ...Relationship) []edge {
@@ -176,33 +175,33 @@ func (v ContainerView) Dot(w io.Writer, model Model) error {
 	fmt.Println(v)
 
 	for _, name := range v.Containers {
-		cont, ok := model.containers[name]
+		cont, ok := model.Containers[name]
 		if !ok {
 			// TODO: is this an error?
 			continue
 		}
 		coreNodes = append(coreNodes, containerNode(cont))
-		edges = append(edges, relationshipEdges(model.Relationships(name)...)...)
+		edges = append(edges, relationshipEdges(model.SourceRelationships(name)...)...)
 	}
 
 	for _, name := range v.Systems {
-		sys, ok := model.systems[name]
+		sys, ok := model.Systems[name]
 		if !ok {
 			// TODO: is this an error?
 			continue
 		}
 		extNodes = append(extNodes, systemNode(sys))
-		edges = append(edges, relationshipEdges(model.Relationships(name)...)...)
+		edges = append(edges, relationshipEdges(model.SourceRelationships(name)...)...)
 	}
 
 	for _, name := range v.Personas {
-		pers, ok := model.personas[name]
+		pers, ok := model.Personas[name]
 		if !ok {
 			// TODO: is this an error?
 			continue
 		}
 		extNodes = append(extNodes, personaNode(pers))
-		edges = append(edges, relationshipEdges(model.Relationships(name)...)...)
+		edges = append(edges, relationshipEdges(model.SourceRelationships(name)...)...)
 	}
 
 	return genDot(w, graph{Title: v.title, CoreNodes: coreNodes, ExternalNodes: extNodes, Edges: edges})
@@ -214,33 +213,33 @@ func (v SystemContextView) Dot(w io.Writer, model Model) error {
 	edges := make([]edge, 0)
 
 	for _, name := range v.CoreSystems {
-		sys, ok := model.systems[name]
+		sys, ok := model.Systems[name]
 		if !ok {
 			// TODO: is this an error?
 			continue
 		}
 		coreNodes = append(coreNodes, systemNode(sys))
-		edges = append(edges, relationshipEdges(model.Relationships(name)...)...)
+		edges = append(edges, relationshipEdges(model.SourceRelationships(name)...)...)
 	}
 
 	for _, name := range v.ExternalSystems {
-		sys, ok := model.systems[name]
+		sys, ok := model.Systems[name]
 		if !ok {
 			// TODO: is this an error?
 			continue
 		}
 		extNodes = append(extNodes, systemNode(sys))
-		edges = append(edges, relationshipEdges(model.Relationships(name)...)...)
+		edges = append(edges, relationshipEdges(model.SourceRelationships(name)...)...)
 	}
 
 	for _, name := range v.Personas {
-		pers, ok := model.personas[name]
+		pers, ok := model.Personas[name]
 		if !ok {
 			// TODO: is this an error?
 			continue
 		}
 		extNodes = append(extNodes, personaNode(pers))
-		edges = append(edges, relationshipEdges(model.Relationships(name)...)...)
+		edges = append(edges, relationshipEdges(model.SourceRelationships(name)...)...)
 	}
 
 	return genDot(w, graph{Title: v.title, CoreNodes: coreNodes, ExternalNodes: extNodes, Edges: edges})

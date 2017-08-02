@@ -3,28 +3,27 @@
 // GNU General Public License Version 2
 // which can be found in the LICENSE file.
 
-package main
+package blueprint
 
 type Model struct {
-	personas       map[string]Persona
-	systemContexts map[string]SystemContext
-	systems        map[string]System
-	containers     map[string]Container
-	components     map[string]Component
-	relationships  []Relationship
-	views          map[string]View
-	errors         []error
+	Personas       map[string]Persona
+	SystemContexts map[string]SystemContext
+	Systems        map[string]System
+	Containers     map[string]Container
+	Components     map[string]Component
+	Relationships  []Relationship
+	Errors         []error
 }
 
 func newModel() *Model {
 	m := new(Model)
-	m.personas = make(map[string]Persona)
-	m.systemContexts = make(map[string]SystemContext)
-	m.systems = make(map[string]System)
-	m.containers = make(map[string]Container)
-	m.components = make(map[string]Component)
-	m.relationships = make([]Relationship, 0)
-	m.errors = make([]error, 0)
+	m.Personas = make(map[string]Persona)
+	m.SystemContexts = make(map[string]SystemContext)
+	m.Systems = make(map[string]System)
+	m.Containers = make(map[string]Container)
+	m.Components = make(map[string]Component)
+	m.Relationships = make([]Relationship, 0)
+	m.Errors = make([]error, 0)
 	return m
 }
 
@@ -71,9 +70,9 @@ type Relationship struct {
 	Tags        []string
 }
 
-func (m Model) Relationships(source string) []Relationship {
+func (m Model) SourceRelationships(source string) []Relationship {
 	rels := make([]Relationship, 0)
-	for _, r := range m.relationships {
+	for _, r := range m.Relationships {
 		if r.Source != source {
 			continue
 		}

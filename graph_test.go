@@ -3,7 +3,7 @@
 // GNU General Public License Version 2
 // which can be found in the LICENSE file.
 
-package main
+package blueprint
 
 import (
 	"bytes"

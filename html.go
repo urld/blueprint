@@ -3,7 +3,7 @@
 // GNU General Public License Version 2
 // which can be found in the LICENSE file.
 
-package main
+package blueprint
 
 import (
 	"bytes"
@@ -89,11 +89,11 @@ type page struct {
 	GenWarning  error
 }
 
-func renderPage(w io.Writer, view View, model Model) error {
+func RenderPage(w io.Writer, view View, model Model) error {
 	p := page{
 		Title:       view.Title(),
 		Description: view.Description(),
-		ModelErrors: model.errors,
+		ModelErrors: model.Errors,
 	}
 
 	svgBuf := new(bytes.Buffer)

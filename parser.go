@@ -3,7 +3,7 @@
 // GNU General Public License Version 2
 // which can be found in the LICENSE file.
 
-package main
+package blueprint
 
 import (
 	"bufio"
@@ -75,7 +75,7 @@ func parseFile(path string, m *Model) error {
 		case "SystemContext":
 			parseSystemContext(m, path, lineno, value)
 		default:
-			addErr(m, path, lineno, "unknown keyword: "+key)
+			m.addErr(path, lineno, "unknown keyword: "+key)
 		}
 
 	}
@@ -86,53 +86,53 @@ func parseFile(path string, m *Model) error {
 func parsePersona(m *Model, path string, lineno int, value string) {
 	fields := strings.Split(value, "|")
 	if len(fields) < 3 {
-		addErr(m, path, lineno, "Persona requires 3 elements: Name | Description | Tags")
+		m.addErr(path, lineno, "Persona requires 3 elements: Name | Description | Tags")
 		return
 	}
 	if len(fields) > 3 {
-		addErr(m, path, lineno, "Persona requires 3 elements: Name | Description | Tags")
+		m.addErr(path, lineno, "Persona requires 3 elements: Name | Description | Tags")
 	}
 
 	name := strings.TrimSpace(fields[0])
 	description := strings.TrimSpace(fields[1])
 	tags := parseTags(fields[2])
 
-	if _, ok := m.personas[name]; ok {
-		addErr(m, path, lineno, "Persona is already defined: "+name)
+	if _, ok := m.Personas[name]; ok {
+		m.addErr(path, lineno, "Persona is already defined: "+name)
 		return
 	}
-	m.personas[name] = Persona{Name: name, Description: description, Tags: tags}
+	m.Personas[name] = Persona{Name: name, Description: description, Tags: tags}
 }
 
 func parseSystem(m *Model, path string, lineno int, value string) {
 	fields := strings.Split(value, "|")
 	if len(fields) < 3 {
-		addErr(m, path, lineno, "System requires 3 elements: Name | Description | Tags")
+		m.addErr(path, lineno, "System requires 3 elements: Name | Description | Tags")
 		return
 	}
 	if len(fields) > 3 {
-		addErr(m, path, lineno, "System requires 3 elements: Name | Description | Tags")
+		m.addErr(path, lineno, "System requires 3 elements: Name | Description | Tags")
 	}
 
 	name := strings.TrimSpace(fields[0])
 	description := strings.TrimSpace(fields[1])
 	tags := parseTags(fields[2])
 
-	if _, ok := m.systems[name]; ok {
-		addErr(m, path, lineno, "System is already defined: "+name)
+	if _, ok := m.Systems[name]; ok {
+		m.addErr(path, lineno, "System is already defined: "+name)
 		return
 	}
-	m.systems[name] = System{Name: name, Description: description, Tags: tags}
+	m.Systems[name] = System{Name: name, Description: description, Tags: tags}
 }
 
 func parseContainer(m *Model, path string, lineno int, value string) {
 	fields := strings.Split(value, "|")
 	if len(fields) < 5 {
-		addErr(m, path, lineno, "Container requires 5 elements: System | Name | Description | Technology | Tags")
+		m.addErr(path, lineno, "Container requires 5 elements: System | Name | Description | Technology | Tags")
 		return
 	}
 	if len(fields) > 5 {
-		addErr(m, path, lineno, "Container requires 5 elements: System | Name | Description | Technology | Tags")
+		m.addErr(path, lineno, "Container requires 5 elements: System | Name | Description | Technology | Tags")
 	}
 
 	system := strings.TrimSpace(fields[0])
@@ -141,21 +141,21 @@ func parseContainer(m *Model, path string, lineno int, value string) {
 	technology := strings.TrimSpace(fields[3])
 	tags := parseTags(fields[4])
 
-	if _, ok := m.containers[name]; ok {
-		addErr(m, path, lineno, "Container is already defined: "+name)
+	if _, ok := m.Containers[name]; ok {
+		m.addErr(path, lineno, "Container is already defined: "+name)
 		return
 	}
-	m.containers[name] = Container{Name: name, System: system, Description: description, Technology: technology, Tags: tags}
+	m.Containers[name] = Container{Name: name, System: system, Description: description, Technology: technology, Tags: tags}
 }
 
 func parseComponent(m *Model, path string, lineno int, value string) {
 	fields := strings.Split(value, "|")
 	if len(fields) < 5 {
-		addErr(m, path, lineno, "Component requires 5 elements: Container | Name | Description | Technology | Tags")
+		m.addErr(path, lineno, "Component requires 5 elements: Container | Name | Description | Technology | Tags")
 		return
 	}
 	if len(fields) > 5 {
-		addErr(m, path, lineno, "Component requires 5 elements: Container | Name | Description | Technology | Tags")
+		m.addErr(path, lineno, "Component requires 5 elements: Container | Name | Description | Technology | Tags")
 	}
 
 	container := strings.TrimSpace(fields[0])
@@ -164,21 +164,21 @@ func parseComponent(m *Model, path string, lineno int, value string) {
 	technology := strings.TrimSpace(fields[3])
 	tags := parseTags(fields[4])
 
-	if _, ok := m.components[name]; ok {
-		addErr(m, path, lineno, "Component is already defined: "+name)
+	if _, ok := m.Components[name]; ok {
+		m.addErr(path, lineno, "Component is already defined: "+name)
 		return
 	}
-	m.components[name] = Component{Name: name, Container: container, Description: description, Technology: technology, Tags: tags}
+	m.Components[name] = Component{Name: name, Container: container, Description: description, Technology: technology, Tags: tags}
 }
 
 func parseRelationship(m *Model, path string, lineno int, value string) {
 	fields := strings.Split(value, "|")
 	if len(fields) < 5 {
-		addErr(m, path, lineno, "Relationship requires 5 elements: Source | Description | Technology | Destination | Tags")
+		m.addErr(path, lineno, "Relationship requires 5 elements: Source | Description | Technology | Destination | Tags")
 		return
 	}
 	if len(fields) > 5 {
-		addErr(m, path, lineno, "Relationship requires 5 elements: Source | Description | Technology | Destination | Tags")
+		m.addErr(path, lineno, "Relationship requires 5 elements: Source | Description | Technology | Destination | Tags")
 	}
 
 	source := strings.TrimSpace(fields[0])
@@ -187,18 +187,18 @@ func parseRelationship(m *Model, path string, lineno int, value string) {
 	destination := strings.TrimSpace(fields[3])
 	tags := parseTags(fields[4])
 
-	m.relationships = append(m.relationships,
+	m.Relationships = append(m.Relationships,
 		Relationship{Source: source, Description: description, Technology: technology, Destination: destination, Tags: tags})
 }
 
 func parseSystemContext(m *Model, path string, lineno int, value string) {
 	fields := strings.Split(value, "|")
 	if len(fields) < 4 {
-		addErr(m, path, lineno, "SystemContext requires 4 elements: CoreSystems | ExternalSystems | Name | Description")
+		m.addErr(path, lineno, "SystemContext requires 4 elements: CoreSystems | ExternalSystems | Name | Description")
 		return
 	}
 	if len(fields) > 4 {
-		addErr(m, path, lineno, "SystemContext requires 4 elements: CoreSystems | ExternalSystems | Name | Description")
+		m.addErr(path, lineno, "SystemContext requires 4 elements: CoreSystems | ExternalSystems | Name | Description")
 	}
 
 	coreSys := parseTags(fields[0])
@@ -206,33 +206,11 @@ func parseSystemContext(m *Model, path string, lineno int, value string) {
 	name := strings.TrimSpace(fields[2])
 	description := strings.TrimSpace(fields[3])
 
-	if _, ok := m.views[name]; ok {
-		addErr(m, path, lineno, "View is already defined: "+name)
+	if _, ok := m.SystemContexts[name]; ok {
+		m.addErr(path, lineno, "View is already defined: "+name)
 		return
 	}
-	m.systemContexts[name] = SystemContext{Name: name, Description: description, CoreSystems: coreSys, ExternalSystems: extSys}
-}
-
-func parseContainerView(m *Model, path string, lineno int, value string) {
-	fields := strings.Split(value, "|")
-	if len(fields) < 4 {
-		addErr(m, path, lineno, "SystemContextView requires 4 elements: CoreSystems | ExternalSystems | Title | Description")
-		return
-	}
-	if len(fields) > 4 {
-		addErr(m, path, lineno, "SystemContextView requires 4 elements: CoreSystems | ExternalSystems | Title | Description")
-	}
-
-	coreSys := parseTags(fields[0])
-	extSys := parseTags(fields[1])
-	title := strings.TrimSpace(fields[2])
-	description := strings.TrimSpace(fields[3])
-
-	if _, ok := m.views[title]; ok {
-		addErr(m, path, lineno, "View is already defined: "+title)
-		return
-	}
-	m.views[title] = SystemContextView{title: title, description: description, CoreSystems: coreSys, ExternalSystems: extSys}
+	m.SystemContexts[name] = SystemContext{Name: name, Description: description, CoreSystems: coreSys, ExternalSystems: extSys}
 }
 
 func parseTags(s string) []string {
@@ -243,7 +221,7 @@ func parseTags(s string) []string {
 	return tags
 }
 
-func addErr(m *Model, path string, lineno int, msg string) {
+func (m *Model) addErr(path string, lineno int, msg string) {
 	err := ParseError{File: path, Line: lineno, Msg: msg}
-	m.errors = append(m.errors, err)
+	m.Errors = append(m.Errors, err)
 }
