@@ -89,7 +89,12 @@ type page struct {
 	GenWarning  error
 }
 
-func RenderPage(w io.Writer, view View, model Model) error {
+// RenderHTMLPage creates a HTML page for a certain view of the model.
+// The resulting HTML is written to the writer, even if the model contains some
+// errors. Such errors are shown in the resulting HTML page.
+// An error is only returned if critical errors occur during the rendering of
+// the actual graph, or HTML page.
+func RenderHTMLPage(w io.Writer, view View, model Model) error {
 	p := page{
 		Title:       view.Title(),
 		Description: view.Description(),

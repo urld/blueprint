@@ -41,7 +41,8 @@ func TestGenDot(t *testing.T) {
 	g := graph{Title: "Test Title", CoreNodes: n, ExternalNodes: en, Edges: e}
 
 	buf := new(bytes.Buffer)
-	genDot(buf, g)
+	err := genDot(buf, g)
 
 	assertEqual(t, expectedGenDot, buf.String(), "generated dot input does not match")
+	assertEqual(t, nil, err, "genDot returned an error")
 }

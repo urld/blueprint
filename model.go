@@ -5,6 +5,7 @@
 
 package blueprint
 
+// Model is the C4 architecture model representation of a project.
 type Model struct {
 	Personas       map[string]Persona
 	SystemContexts map[string]SystemContext
@@ -27,12 +28,15 @@ func newModel() *Model {
 	return m
 }
 
+// A Persona that interacts with other entities of the software system.
 type Persona struct {
 	Name        string
 	Description string
 	Tags        []string
 }
 
+// A SystemContext defines a subset of Systems of the whole project that
+// interact with each other.
 type SystemContext struct {
 	Name            string
 	Description     string
@@ -40,12 +44,14 @@ type SystemContext struct {
 	ExternalSystems []string
 }
 
+// A System according to the C4 software architecture model.
 type System struct {
 	Name        string
 	Description string
 	Tags        []string
 }
 
+// A Container according to the C4 software architecture model.
 type Container struct {
 	System      string
 	Name        string
@@ -54,6 +60,7 @@ type Container struct {
 	Tags        []string
 }
 
+// A Component according to the C4 software architecture model.
 type Component struct {
 	Container   string
 	Name        string
@@ -62,6 +69,7 @@ type Component struct {
 	Tags        []string
 }
 
+// A Relationship between two arbitrary entities of the C4 model.
 type Relationship struct {
 	Source      string
 	Description string
@@ -70,13 +78,20 @@ type Relationship struct {
 	Tags        []string
 }
 
-func (m Model) SourceRelationships(source string) []Relationship {
+// FindRelationships searches for relationships which are relevant for a given
+// set of set of nodes. A relationship is considered relevant if both its
+// Source and Destination are part of the given node set.
+func (m Model) FindRelationships(nodes []string) []Relationship {
+	nodeSet := make(map[string]bool)
+	for _, n := range nodes {
+		nodeSet[n] = true
+	}
+
 	rels := make([]Relationship, 0)
 	for _, r := range m.Relationships {
-		if r.Source != source {
-			continue
+		if nodeSet[r.Source] && nodeSet[r.Destination] {
+			rels = append(rels, r)
 		}
-		rels = append(rels, r)
 	}
 	return rels
 }

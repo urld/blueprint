@@ -13,16 +13,21 @@ import (
 	"strings"
 )
 
-type ParseError struct {
+type parseError struct {
 	Msg  string
 	File string
 	Line int
 }
 
-func (e ParseError) Error() string {
+func (e parseError) Error() string {
 	return fmt.Sprintf("%s:%d: %s", e.File, e.Line, e.Msg)
 }
 
+// Parse all the files located recursively in path and return the resulting
+// model. An error is returned if parsing could not be resumed. "Soft" errors
+// which only cause a maybe incorrect model, which can still represented
+// containing erroneus entities or relationships, (e.g. a duplicate definition
+// of the same entity) are stored in the model.
 func Parse(path string) (Model, error) {
 	m := newModel()
 	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
@@ -222,6 +227,6 @@ func parseTags(s string) []string {
 }
 
 func (m *Model) addErr(path string, lineno int, msg string) {
-	err := ParseError{File: path, Line: lineno, Msg: msg}
+	err := parseError{File: path, Line: lineno, Msg: msg}
 	m.Errors = append(m.Errors, err)
 }

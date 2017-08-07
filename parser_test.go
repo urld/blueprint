@@ -34,7 +34,7 @@ func TestParseSystemMissingElemet(t *testing.T) {
 	parseSystem(m, path, 1, value)
 
 	assertEqual(t, 1, len(m.Errors), "1 error expected")
-	expectedErr := ParseError{File: path, Line: 1, Msg: "System requires 3 elements: Name | Description | Tags"}
+	expectedErr := parseError{File: path, Line: 1, Msg: "System requires 3 elements: Name | Description | Tags"}
 	assertEqual(t, expectedErr, m.Errors[0], "error does not match")
 
 	assertEqual(t, 0, len(m.Systems), "0 systems expected")
@@ -49,7 +49,7 @@ func TestParseSystemDuplicate(t *testing.T) {
 	parseSystem(m, path, 2, value)
 
 	assertEqual(t, 1, len(m.Errors), "1 error expected")
-	expectedErr := ParseError{File: path, Line: 2, Msg: "System is already defined: Test System"}
+	expectedErr := parseError{File: path, Line: 2, Msg: "System is already defined: Test System"}
 	assertEqual(t, expectedErr, m.Errors[0], "error does not match")
 
 	assertEqual(t, 1, len(m.Systems), "1 system expected")

@@ -9,13 +9,15 @@ import (
 	"io"
 )
 
+// A View represents a specific subset of entities of a complete model.
+// It can be rendered using RenderHTMLPage.
 type View interface {
 	Title() string
 	Description() string
-	Dot(w io.Writer, model Model) error
+	dot(w io.Writer, model Model) error
 }
 
-type SystemContextView struct {
+type systemContextView struct {
 	title           string
 	description     string
 	CoreSystems     []string
@@ -23,15 +25,15 @@ type SystemContextView struct {
 	Personas        []string
 }
 
-func (v SystemContextView) Description() string {
+func (v systemContextView) Description() string {
 	return v.description
 }
 
-func (v SystemContextView) Title() string {
+func (v systemContextView) Title() string {
 	return v.title
 }
 
-type ContainerView struct {
+type containerView struct {
 	title       string
 	description string
 	System      string
@@ -40,15 +42,15 @@ type ContainerView struct {
 	Personas    []string
 }
 
-func (v ContainerView) Description() string {
+func (v containerView) Description() string {
 	return v.description
 }
 
-func (v ContainerView) Title() string {
+func (v containerView) Title() string {
 	return v.title
 }
 
-type ComponentView struct {
+type componentView struct {
 	title       string
 	description string
 	Container   string
@@ -58,21 +60,21 @@ type ComponentView struct {
 	Personas    []string
 }
 
-func (v ComponentView) Description() string {
+func (v componentView) Description() string {
 	return v.description
 }
 
-func (v ComponentView) Title() string {
+func (v componentView) Title() string {
 	return v.title
 }
 
-func NewSystemContextView(m Model, sysCtx SystemContext) View {
+func (m Model) NewSystemContextView(sysCtx SystemContext) View {
 	personas := make([]string, 0)
 	for k := range m.Personas {
 		personas = append(personas, k)
 	}
 
-	return SystemContextView{
+	return systemContextView{
 		title:           sysCtx.Name,
 		description:     sysCtx.Description,
 		CoreSystems:     sysCtx.CoreSystems,
@@ -82,15 +84,19 @@ func NewSystemContextView(m Model, sysCtx SystemContext) View {
 
 }
 
-func NewContainerView(m Model, sys System) View {
+func (m Model) NewContainerView(sys System) View {
 	containers := make([]string, 0)
 	systems := make([]string, 0)
+
 	for k, c := range m.Containers {
 		if c.System != sys.Name {
 			continue
 		}
 		containers = append(containers, k)
-		for _, r := range m.SourceRelationships(c.Name) {
+		for _, r := range m.Relationships {
+			if r.Source != c.Name {
+				continue
+			}
 			if _, ok := m.Systems[r.Destination]; ok {
 				systems = append(systems, r.Destination)
 			}
@@ -102,7 +108,7 @@ func NewContainerView(m Model, sys System) View {
 		personas = append(personas, k)
 	}
 
-	return ContainerView{
+	return containerView{
 		title:       sys.Name,
 		description: sys.Description,
 		System:      sys.Name,
@@ -112,12 +118,12 @@ func NewContainerView(m Model, sys System) View {
 	}
 }
 
-func NewComponentView(m Model, c Component) View {
+func (m Model) NewComponentView(c Component) View {
 	// TODO
 	return nil
 }
 
-func NewGenericSystemContextView(m Model) View {
+func (m Model) NewGenericSystemContextView() View {
 	systems := make([]string, 0)
 	for k := range m.Systems {
 		systems = append(systems, k)
@@ -128,7 +134,7 @@ func NewGenericSystemContextView(m Model) View {
 		personas = append(personas, k)
 	}
 
-	return SystemContextView{
+	return systemContextView{
 		title:           "System Context Diagram",
 		description:     "The complete system context diagram, containing all systems of the current project.",
 		CoreSystems:     systems,

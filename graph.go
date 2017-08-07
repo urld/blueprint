@@ -87,7 +87,7 @@ func renderGraph(w io.Writer, view View, model Model) error {
 		return err
 	}
 
-	err = view.Dot(io.MultiWriter(in, os.Stdout), model)
+	err = view.dot(io.MultiWriter(in, os.Stdout), model)
 	if err != nil {
 		return err
 	}
@@ -168,11 +168,11 @@ func relationshipEdges(rs ...Relationship) []edge {
 	return edges
 }
 
-func (v ContainerView) Dot(w io.Writer, model Model) error {
+func (v containerView) dot(w io.Writer, model Model) error {
 	coreNodes := make([]node, 0)
 	extNodes := make([]node, 0)
 	edges := make([]edge, 0)
-	fmt.Println(v)
+	names := make([]string, 0)
 
 	for _, name := range v.Containers {
 		cont, ok := model.Containers[name]
@@ -181,7 +181,7 @@ func (v ContainerView) Dot(w io.Writer, model Model) error {
 			continue
 		}
 		coreNodes = append(coreNodes, containerNode(cont))
-		edges = append(edges, relationshipEdges(model.SourceRelationships(name)...)...)
+		names = append(names, name)
 	}
 
 	for _, name := range v.Systems {
@@ -191,7 +191,7 @@ func (v ContainerView) Dot(w io.Writer, model Model) error {
 			continue
 		}
 		extNodes = append(extNodes, systemNode(sys))
-		edges = append(edges, relationshipEdges(model.SourceRelationships(name)...)...)
+		names = append(names, name)
 	}
 
 	for _, name := range v.Personas {
@@ -201,16 +201,19 @@ func (v ContainerView) Dot(w io.Writer, model Model) error {
 			continue
 		}
 		extNodes = append(extNodes, personaNode(pers))
-		edges = append(edges, relationshipEdges(model.SourceRelationships(name)...)...)
+		names = append(names, name)
 	}
+
+	edges = append(edges, relationshipEdges(model.FindRelationships(names)...)...)
 
 	return genDot(w, graph{Title: v.title, CoreNodes: coreNodes, ExternalNodes: extNodes, Edges: edges})
 }
 
-func (v SystemContextView) Dot(w io.Writer, model Model) error {
+func (v systemContextView) dot(w io.Writer, model Model) error {
 	coreNodes := make([]node, 0)
 	extNodes := make([]node, 0)
 	edges := make([]edge, 0)
+	names := make([]string, 0)
 
 	for _, name := range v.CoreSystems {
 		sys, ok := model.Systems[name]
@@ -219,7 +222,7 @@ func (v SystemContextView) Dot(w io.Writer, model Model) error {
 			continue
 		}
 		coreNodes = append(coreNodes, systemNode(sys))
-		edges = append(edges, relationshipEdges(model.SourceRelationships(name)...)...)
+		names = append(names, name)
 	}
 
 	for _, name := range v.ExternalSystems {
@@ -229,7 +232,7 @@ func (v SystemContextView) Dot(w io.Writer, model Model) error {
 			continue
 		}
 		extNodes = append(extNodes, systemNode(sys))
-		edges = append(edges, relationshipEdges(model.SourceRelationships(name)...)...)
+		names = append(names, name)
 	}
 
 	for _, name := range v.Personas {
@@ -239,8 +242,10 @@ func (v SystemContextView) Dot(w io.Writer, model Model) error {
 			continue
 		}
 		extNodes = append(extNodes, personaNode(pers))
-		edges = append(edges, relationshipEdges(model.SourceRelationships(name)...)...)
+		names = append(names, name)
 	}
+
+	edges = append(edges, relationshipEdges(model.FindRelationships(names)...)...)
 
 	return genDot(w, graph{Title: v.title, CoreNodes: coreNodes, ExternalNodes: extNodes, Edges: edges})
 }

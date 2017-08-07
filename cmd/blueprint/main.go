@@ -52,7 +52,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	var view blueprint.View
 	if r.URL.Path[1:] == "" {
-		view = blueprint.NewGenericSystemContextView(model)
+		view = model.NewGenericSystemContextView()
 	} else {
 		name := r.URL.Path[1:]
 		switch r.URL.Query().Get("view") {
@@ -62,28 +62,28 @@ func handler(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "Model not found.", http.StatusNotFound)
 				return
 			}
-			view = blueprint.NewSystemContextView(model, sysCtx)
+			view = model.NewSystemContextView(sysCtx)
 		case "container":
 			sys, ok := model.Systems[name]
 			if !ok {
 				http.Error(w, "Model not found.", http.StatusNotFound)
 				return
 			}
-			view = blueprint.NewContainerView(model, sys)
+			view = model.NewContainerView(sys)
 		case "component":
 			component, ok := model.Components[name]
 			if !ok {
 				http.Error(w, "Model not found.", http.StatusNotFound)
 				return
 			}
-			view = blueprint.NewComponentView(model, component)
+			view = model.NewComponentView(component)
 		default:
 			http.Error(w, "Unknown view kind", http.StatusBadRequest)
 			return
 		}
 	}
 
-	err = blueprint.RenderPage(w, view, model)
+	err = blueprint.RenderHTMLPage(w, view, model)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
