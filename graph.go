@@ -131,7 +131,18 @@ func containerNode(c Container) node {
 			wrapWords(c.Description, lineLimit),
 		"fillcolor": containerColor,
 		"color":     containerBorderColor,
-		"URL":       "../" + url.PathEscape(c.Name) + "?view=container",
+		"URL":       "../" + url.PathEscape(c.Name) + "?view=component",
+		"rank":      "source",
+	}
+	return node{Name: c.Name, Attrs: attrs}
+}
+
+func componentNode(c Component) node {
+	attrs := map[string]string{
+		"label": "<FONT POINT-SIZE=\"14\"><B>" + c.Name + "</B></FONT><BR/>[Component]<BR/><BR/>" +
+			wrapWords(c.Description, lineLimit),
+		"fillcolor": componentColor,
+		"color":     componentBorderColor,
 	}
 	return node{Name: c.Name, Attrs: attrs}
 }
@@ -166,6 +177,47 @@ func relationshipEdges(rs ...Relationship) []edge {
 		edges = append(edges, relationshipEdge(r))
 	}
 	return edges
+}
+
+func (v componentView) dot(w io.Writer, model Model) error {
+	coreNodes := make([]node, 0)
+	extNodes := make([]node, 0)
+	edges := make([]edge, 0)
+	names := make([]string, 0)
+
+	for _, name := range v.Components {
+		cont, ok := model.Components[name]
+		if !ok {
+			// TODO: is this an error?
+			continue
+		}
+		coreNodes = append(coreNodes, componentNode(cont))
+		names = append(names, name)
+	}
+
+	for _, name := range v.Containers {
+		cont, ok := model.Containers[name]
+		if !ok {
+			// TODO: is this an error?
+			continue
+		}
+		extNodes = append(extNodes, containerNode(cont))
+		names = append(names, name)
+	}
+
+	for _, name := range v.Systems {
+		sys, ok := model.Systems[name]
+		if !ok {
+			// TODO: is this an error?
+			continue
+		}
+		extNodes = append(extNodes, systemNode(sys))
+		names = append(names, name)
+	}
+
+	edges = append(edges, relationshipEdges(model.FindRelationships(names)...)...)
+
+	return genDot(w, graph{Title: v.title, CoreNodes: coreNodes, ExternalNodes: extNodes, Edges: edges})
 }
 
 func (v containerView) dot(w io.Writer, model Model) error {

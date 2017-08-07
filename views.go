@@ -57,7 +57,6 @@ type componentView struct {
 	Components  []string
 	Containers  []string
 	Systems     []string
-	Personas    []string
 }
 
 func (v componentView) Description() string {
@@ -87,6 +86,7 @@ func (m Model) NewSystemContextView(sysCtx SystemContext) View {
 func (m Model) NewContainerView(sys System) View {
 	containers := make([]string, 0)
 	systems := make([]string, 0)
+	personas := make([]string, 0)
 
 	for k, c := range m.Containers {
 		if c.System != sys.Name {
@@ -94,18 +94,23 @@ func (m Model) NewContainerView(sys System) View {
 		}
 		containers = append(containers, k)
 		for _, r := range m.Relationships {
-			if r.Source != c.Name {
-				continue
-			}
-			if _, ok := m.Systems[r.Destination]; ok {
-				systems = append(systems, r.Destination)
+			if r.Source == c.Name {
+				if _, ok := m.Systems[r.Destination]; ok {
+					systems = append(systems, r.Destination)
+				}
+				if _, ok := m.Personas[r.Destination]; ok {
+					personas = append(personas, r.Destination)
+				}
+			} else if r.Destination == c.Name {
+				if _, ok := m.Systems[r.Source]; ok {
+					systems = append(systems, r.Source)
+				}
+				if _, ok := m.Personas[r.Source]; ok {
+					personas = append(personas, r.Source)
+				}
+
 			}
 		}
-	}
-
-	personas := make([]string, 0)
-	for k := range m.Personas {
-		personas = append(personas, k)
 	}
 
 	return containerView{
@@ -118,9 +123,43 @@ func (m Model) NewContainerView(sys System) View {
 	}
 }
 
-func (m Model) NewComponentView(c Component) View {
-	// TODO
-	return nil
+func (m Model) NewComponentView(cont Container) View {
+	components := make([]string, 0)
+	containers := make([]string, 0)
+	systems := make([]string, 0)
+
+	for k, c := range m.Components {
+		if c.Container != cont.Name {
+			continue
+		}
+		components = append(components, k)
+		for _, r := range m.Relationships {
+			if r.Source == c.Name {
+				if _, ok := m.Systems[r.Destination]; ok {
+					systems = append(systems, r.Destination)
+				}
+				if _, ok := m.Containers[r.Destination]; ok {
+					containers = append(containers, r.Destination)
+				}
+			} else if r.Destination == c.Name {
+				if _, ok := m.Systems[r.Source]; ok {
+					systems = append(systems, r.Source)
+				}
+				if _, ok := m.Containers[r.Source]; ok {
+					containers = append(containers, r.Source)
+				}
+			}
+		}
+	}
+
+	return componentView{
+		title:       cont.Name,
+		description: cont.Description,
+		Container:   cont.Name,
+		Containers:  containers,
+		Components:  components,
+		Systems:     systems,
+	}
 }
 
 func (m Model) NewGenericSystemContextView() View {

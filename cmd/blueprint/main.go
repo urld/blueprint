@@ -71,12 +71,12 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			}
 			view = model.NewContainerView(sys)
 		case "component":
-			component, ok := model.Components[name]
+			container, ok := model.Containers[name]
 			if !ok {
 				http.Error(w, "Model not found.", http.StatusNotFound)
 				return
 			}
-			view = model.NewComponentView(component)
+			view = model.NewComponentView(container)
 		default:
 			http.Error(w, "Unknown view kind", http.StatusBadRequest)
 			return

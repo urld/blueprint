@@ -1,0 +1,6 @@
+Component = Web App | Web Interface Templates | Fancy static UI templates for modern webbrowsers | HTML5, CSS |
+Component = Web App | Content Server | Serves static generated content | Golang HTTP Server |
+
+Relationship = Content Server | Uses | Go html/template | Web Interface Templates |
+
+Relationship = Content Server | Reads data | SQL, port 5432 | Database |
