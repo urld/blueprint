@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/pkg/browser"
@@ -54,8 +55,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path[1:] == "" {
 		view = model.NewGenericSystemContextView()
 	} else {
-		name := r.URL.Path[1:]
-		switch r.URL.Query().Get("view") {
+		viewKind, name := path.Split(r.URL.Path[1:])
+		switch path.Dir(viewKind) {
 		case "context":
 			sysCtx, ok := model.SystemContexts[name]
 			if !ok {
@@ -78,7 +79,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			}
 			view = model.NewComponentView(container)
 		default:
-			http.Error(w, "Unknown view kind", http.StatusBadRequest)
+			http.Error(w, "Unknown view kind: "+viewKind, http.StatusBadRequest)
 			return
 		}
 	}
