@@ -19,7 +19,7 @@ Run blueprint for a specific project directory to launch an interactive http ser
 
 You can click on each element to change views.
 
-![Example](https://github.com/urld/fatdeps/raw/master/test/example.png)
+![Example](https://github.com/urld/blueprint/blob/master/test/example.png)
 
 ### Syntax 
 
