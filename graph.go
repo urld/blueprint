@@ -39,15 +39,35 @@ digraph "{{.Title}}" {
 	subgraph cluster_core {
 		color="#7b7b7b";
 		style="dashed,rounded,bold";
+		"__core__" [label="" style="invis" fixedsize="true" height="0.01" width="0.01"];
 		{{- range .CoreNodes}}
 		"{{.Name}}" [{{range $k, $v := .Attrs}} {{$k}}=<{{$v}}>{{end}} ];
 		{{- end}}
 	}
 
-	// other nodes:
-	{{- range .ExternalNodes}}
-	"{{.Name}}" [{{range $k, $v := .Attrs}} {{$k}}=<{{$v}}>{{end}} ];
+	// Fake edges to ensure cluster ranks
+	"__top__" -> "__core__" -> "__bottom__" [style="invis"];
+	{{- range .CoreNodes}}
+	"__top__" -> "{{.Name}}" -> "__bottom__" [style="invis"];
 	{{- end}}
+
+	subgraph cluster_top {
+		rank="min,same";
+		style="invis";
+		"__top__" [label="" style="invis" fixedsize="true" height="0.01" width="0.01"];
+		{{- range .TopNodes}}
+		"{{.Name}}" [{{range $k, $v := .Attrs}} {{$k}}=<{{$v}}>{{end}} ];
+		{{- end}}
+	}
+
+	subgraph cluster_bottom {
+		rank="max,same";
+		style="invis";
+		"__bottom__" [label="" style="invis" fixedsize="true" height="0.01" width="0.01"];
+		{{- range .BottomNodes}}
+		"{{.Name}}" [{{range $k, $v := .Attrs}} {{$k}}=<{{$v}}>{{end}} ];
+		{{- end}}
+	}
 
 	// relationships
 	{{- range .Edges}}
@@ -57,10 +77,11 @@ digraph "{{.Title}}" {
 `
 
 type graph struct {
-	Title         string
-	CoreNodes     []node
-	ExternalNodes []node
-	Edges         []edge
+	Title       string
+	CoreNodes   []node
+	TopNodes    []node
+	BottomNodes []node
+	Edges       []edge
 }
 
 type node struct {
@@ -132,7 +153,6 @@ func containerNode(c Container) node {
 		"fillcolor": containerColor,
 		"color":     containerBorderColor,
 		"URL":       "../" + url.PathEscape(c.Name) + "?view=component",
-		"rank":      "source",
 	}
 	return node{Name: c.Name, Attrs: attrs}
 }
@@ -181,7 +201,8 @@ func relationshipEdges(rs ...Relationship) []edge {
 
 func (v componentView) dot(w io.Writer, model Model) error {
 	coreNodes := make([]node, 0)
-	extNodes := make([]node, 0)
+	topNodes := make([]node, 0)
+	bottomNodes := make([]node, 0)
 	edges := make([]edge, 0)
 	names := make([]string, 0)
 
@@ -201,7 +222,7 @@ func (v componentView) dot(w io.Writer, model Model) error {
 			// TODO: is this an error?
 			continue
 		}
-		extNodes = append(extNodes, containerNode(cont))
+		topNodes = append(topNodes, containerNode(cont))
 		names = append(names, name)
 	}
 
@@ -211,18 +232,19 @@ func (v componentView) dot(w io.Writer, model Model) error {
 			// TODO: is this an error?
 			continue
 		}
-		extNodes = append(extNodes, systemNode(sys))
+		bottomNodes = append(bottomNodes, systemNode(sys))
 		names = append(names, name)
 	}
 
 	edges = append(edges, relationshipEdges(model.FindRelationships(names)...)...)
 
-	return genDot(w, graph{Title: v.title, CoreNodes: coreNodes, ExternalNodes: extNodes, Edges: edges})
+	return genDot(w, graph{Title: v.title, CoreNodes: coreNodes, TopNodes: topNodes, BottomNodes: bottomNodes, Edges: edges})
 }
 
 func (v containerView) dot(w io.Writer, model Model) error {
 	coreNodes := make([]node, 0)
-	extNodes := make([]node, 0)
+	topNodes := make([]node, 0)
+	bottomNodes := make([]node, 0)
 	edges := make([]edge, 0)
 	names := make([]string, 0)
 
@@ -242,7 +264,7 @@ func (v containerView) dot(w io.Writer, model Model) error {
 			// TODO: is this an error?
 			continue
 		}
-		extNodes = append(extNodes, systemNode(sys))
+		bottomNodes = append(bottomNodes, systemNode(sys))
 		names = append(names, name)
 	}
 
@@ -252,18 +274,19 @@ func (v containerView) dot(w io.Writer, model Model) error {
 			// TODO: is this an error?
 			continue
 		}
-		extNodes = append(extNodes, personaNode(pers))
+		topNodes = append(topNodes, personaNode(pers))
 		names = append(names, name)
 	}
 
 	edges = append(edges, relationshipEdges(model.FindRelationships(names)...)...)
 
-	return genDot(w, graph{Title: v.title, CoreNodes: coreNodes, ExternalNodes: extNodes, Edges: edges})
+	return genDot(w, graph{Title: v.title, CoreNodes: coreNodes, TopNodes: topNodes, BottomNodes: bottomNodes, Edges: edges})
 }
 
 func (v systemContextView) dot(w io.Writer, model Model) error {
 	coreNodes := make([]node, 0)
-	extNodes := make([]node, 0)
+	topNodes := make([]node, 0)
+	bottomNodes := make([]node, 0)
 	edges := make([]edge, 0)
 	names := make([]string, 0)
 
@@ -283,7 +306,7 @@ func (v systemContextView) dot(w io.Writer, model Model) error {
 			// TODO: is this an error?
 			continue
 		}
-		extNodes = append(extNodes, systemNode(sys))
+		bottomNodes = append(bottomNodes, systemNode(sys))
 		names = append(names, name)
 	}
 
@@ -293,13 +316,13 @@ func (v systemContextView) dot(w io.Writer, model Model) error {
 			// TODO: is this an error?
 			continue
 		}
-		extNodes = append(extNodes, personaNode(pers))
+		topNodes = append(topNodes, personaNode(pers))
 		names = append(names, name)
 	}
 
 	edges = append(edges, relationshipEdges(model.FindRelationships(names)...)...)
 
-	return genDot(w, graph{Title: v.title, CoreNodes: coreNodes, ExternalNodes: extNodes, Edges: edges})
+	return genDot(w, graph{Title: v.title, CoreNodes: coreNodes, TopNodes: topNodes, BottomNodes: bottomNodes, Edges: edges})
 }
 
 func genDot(w io.Writer, g graph) error {
