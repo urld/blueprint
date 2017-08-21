@@ -11,3 +11,21 @@ install:
 script:
   - go test -v ./...
 
+
+jobs:
+  include:
+    - stage: Github Release
+      go: 1.x
+      before_deploy:
+        - go get -t -v ./...
+        - ./dist.sh
+        
+      deploy:
+        provider: releases
+        api_key:
+          secure: pgbKWlspv35Bgs6lW3EODOpvt6/2oYZy36EA21HzMsYKtSxGw/YMhJjQy5jbnuyvFlwCMPOt4YRx6e0ft4ySfpMrRXQ5b04TYwwbbSM0ZH4hgB5R7il4eOnVhVkCZdTSA0yMFFnzAvHOz9NKxRzQYU5lW1+KU+JblKxofstDwsU2zTh/9icwk6qwD9W91hwZ8IYWnDP/PbyD6QKekwFAnUJymHCkTlXKGEZW8liWhaBhwpUVOlXvEp+JpFX1SBRt+vc4uKZQfqLlRBg68/ASBe7o+5SBZeALXlejXvLoUM/EAbhUiX2KDdUA/+bUpQPTIC+JZxPxfSzvjI0daeOiiWOpjkxRJCEHqZbstJg5y0iOQS4SIiquvKUaPR4cDgptNQGlQr49HIcMaPVGqcPlkWXL6VFgUNmSQiOatb5cyc/VqWcYRkfdsRqvxDURF+yb89Zxx2Tb3j5YlH8xPwSUQhKaL6fCmFaTXDPjoQ6cucxVARqej1ITKQTf47MAZTfYOW4brSp8Zw0qLrcofkG8Jr6qsDDLYXyRjWuWpaq/7GuF7b7kbZU/m+v2xaJ6f6WgaUj6C+jGTgagKu4SAA2cSreBN7K/MthYMCcFGL4vOHhEaD6e+wf3mV3IDn0p8uC5inFSnf/blwAvefawy3RRozWhu/covP0g2037AVv/e9o=
+        file_glob: true
+        file: dist/*
+        skip_cleanup: true
+        on:
+          tags: true
