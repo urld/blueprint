@@ -56,6 +56,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		view = model.NewGenericSystemContextView()
 	} else {
 		viewKind, name := path.Split(r.URL.Path[1:])
+		name = strings.TrimSuffix(name, ".html")
 		switch path.Dir(viewKind) {
 		case "context":
 			sysCtx, ok := model.SystemContexts[name]

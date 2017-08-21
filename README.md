@@ -11,13 +11,17 @@
 First install [graphviz](http://graphviz.org/Download.php) for your OS, then
 
 	go get github.com/urld/blueprint/cmd/blueprint
+	go get github.com/urld/blueprint/cmd/blueprint-export
 
 ## Usage
 Run blueprint for a specific project directory to launch an interactive http server:
 
 	blueprint test/ok
 
-You can click on each element to change views.
+It is also possible to export all views as html, so there is no need to keep the http server
+running all the time:
+
+	blueprint-export -project test/ok/ -output export/dir/
 
 ![Example](https://github.com/urld/blueprint/blob/master/test/example.png)
 
@@ -44,7 +48,6 @@ An example can be found within `test/ok`.
 
 ## TODO
 
-* html file export so there is no need for a http server running all the time
 * improved layout
 * more expressive syntax?
 * more detailed usage documentation

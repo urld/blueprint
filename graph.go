@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"io"
 	"net/url"
-	"os"
 	"os/exec"
 	"strings"
 	"text/template"
@@ -108,7 +107,8 @@ func renderGraph(w io.Writer, view View, model Model) error {
 		return err
 	}
 
-	err = view.dot(io.MultiWriter(in, os.Stdout), model)
+	err = view.dot(in, model)
+	//err = view.dot(io.MultiWriter(in, os.Stdout), model)
 	if err != nil {
 		return err
 	}
@@ -141,7 +141,7 @@ func systemNode(s System) node {
 			wrapWords(s.Description, lineLimit),
 		"fillcolor": systemColor,
 		"color":     systemBorderColor,
-		"URL":       "/container/" + url.PathEscape(s.Name),
+		"URL":       "../container/" + url.PathEscape(s.Name) + ".html",
 	}
 	return node{Name: s.Name, Attrs: attrs}
 }
@@ -152,7 +152,7 @@ func containerNode(c Container) node {
 			wrapWords(c.Description, lineLimit),
 		"fillcolor": containerColor,
 		"color":     containerBorderColor,
-		"URL":       "/component/" + url.PathEscape(c.Name),
+		"URL":       "../component/" + url.PathEscape(c.Name) + ".html",
 	}
 	return node{Name: c.Name, Attrs: attrs}
 }
