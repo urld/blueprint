@@ -43,7 +43,7 @@ func renderProject() error {
 		return err
 	}
 
-	err = os.MkdirAll(path.Join(outputPath, "component"), 0755)
+	err = os.MkdirAll(path.Join(outputPath, "components"), 0755)
 	if err != nil {
 		return err
 	}
@@ -51,13 +51,13 @@ func renderProject() error {
 	for name, container := range model.Containers {
 		view := model.NewComponentView(container)
 
-		err := write(path.Join(outputPath, "component", name+".html"), view, model)
+		err := write(path.Join(outputPath, "components", name+".html"), view, model)
 		if err != nil {
 			return err
 		}
 	}
 
-	err = os.MkdirAll(path.Join(outputPath, "container"), 0755)
+	err = os.MkdirAll(path.Join(outputPath, "containers"), 0755)
 	if err != nil {
 		return err
 	}
@@ -65,13 +65,13 @@ func renderProject() error {
 	for name, system := range model.Systems {
 		view := model.NewContainerView(system)
 
-		err := write(path.Join(outputPath, "container", name+".html"), view, model)
+		err := write(path.Join(outputPath, "containers", name+".html"), view, model)
 		if err != nil {
 			return err
 		}
 	}
 
-	err = os.MkdirAll(path.Join(outputPath, "context"), 0755)
+	err = os.MkdirAll(path.Join(outputPath, "contexts"), 0755)
 	if err != nil {
 		return err
 	}
@@ -79,14 +79,14 @@ func renderProject() error {
 	for name, context := range model.SystemContexts {
 		view := model.NewSystemContextView(context)
 
-		err := write(path.Join(outputPath, "context", name+".html"), view, model)
+		err := write(path.Join(outputPath, "contexts", name+".html"), view, model)
 		if err != nil {
 			return err
 		}
 	}
 
 	view := model.NewGenericSystemContextView()
-	err = write(path.Join(outputPath, "context", "index.html"), view, model)
+	err = write(path.Join(outputPath, "contexts", "index.html"), view, model)
 	if err != nil {
 		return err
 	}

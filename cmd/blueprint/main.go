@@ -58,21 +58,21 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		viewKind, name := path.Split(r.URL.Path[1:])
 		name = strings.TrimSuffix(name, ".html")
 		switch path.Dir(viewKind) {
-		case "context":
+		case "contexts":
 			sysCtx, ok := model.SystemContexts[name]
 			if !ok {
 				http.Error(w, "Model not found.", http.StatusNotFound)
 				return
 			}
 			view = model.NewSystemContextView(sysCtx)
-		case "container":
+		case "containers":
 			sys, ok := model.Systems[name]
 			if !ok {
 				http.Error(w, "Model not found.", http.StatusNotFound)
 				return
 			}
 			view = model.NewContainerView(sys)
-		case "component":
+		case "components":
 			container, ok := model.Containers[name]
 			if !ok {
 				http.Error(w, "Model not found.", http.StatusNotFound)

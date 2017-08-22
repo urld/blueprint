@@ -142,7 +142,7 @@ func systemNode(s System) node {
 			wrapWords(s.Description, lineLimit),
 		"fillcolor": systemColor,
 		"color":     systemBorderColor,
-		"URL":       "../container/" + url.PathEscape(s.Name) + ".html",
+		"URL":       "../containers/" + url.PathEscape(s.Name) + ".html",
 	}
 	return node{Name: s.Name, Attrs: attrs}
 }
@@ -154,7 +154,7 @@ func containerNode(c Container) node {
 			wrapWords(c.Description, lineLimit),
 		"fillcolor": containerColor,
 		"color":     containerBorderColor,
-		"URL":       "../component/" + url.PathEscape(c.Name) + ".html",
+		"URL":       "../components/" + url.PathEscape(c.Name) + ".html",
 	}
 	return node{Name: c.Name, Attrs: attrs}
 }

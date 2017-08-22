@@ -30,7 +30,7 @@ func (v systemContextView) Description() string {
 }
 
 func (v systemContextView) Title() string {
-	return v.title
+	return "[System Context] " + v.title
 }
 
 type containerView struct {
@@ -47,7 +47,7 @@ func (v containerView) Description() string {
 }
 
 func (v containerView) Title() string {
-	return v.title
+	return "[Containers] " + v.title
 }
 
 type componentView struct {
@@ -64,7 +64,7 @@ func (v componentView) Description() string {
 }
 
 func (v componentView) Title() string {
-	return v.title
+	return "[Components] " + v.title
 }
 
 func (m Model) NewSystemContextView(sysCtx SystemContext) View {
