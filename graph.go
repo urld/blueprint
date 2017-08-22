@@ -137,7 +137,8 @@ func renderGraph(w io.Writer, view View, model Model) error {
 
 func systemNode(s System) node {
 	attrs := map[string]string{
-		"label": "<FONT POINT-SIZE=\"14\"><B>" + s.Name + "</B></FONT><BR/>[System]<BR/><BR/>" +
+		"label": "<FONT POINT-SIZE=\"14\"><B>" + s.Name + "</B></FONT><BR/>" +
+			"[System]<BR/><BR/>" +
 			wrapWords(s.Description, lineLimit),
 		"fillcolor": systemColor,
 		"color":     systemBorderColor,
@@ -148,7 +149,8 @@ func systemNode(s System) node {
 
 func containerNode(c Container) node {
 	attrs := map[string]string{
-		"label": "<FONT POINT-SIZE=\"14\"><B>" + c.Name + "</B></FONT><BR/>[Container]<BR/><BR/>" +
+		"label": "<FONT POINT-SIZE=\"14\"><B>" + c.Name + "</B></FONT><BR/>" +
+			nodeTechnology("Container", c.Technology) + "<BR/><BR/>" +
 			wrapWords(c.Description, lineLimit),
 		"fillcolor": containerColor,
 		"color":     containerBorderColor,
@@ -159,7 +161,8 @@ func containerNode(c Container) node {
 
 func componentNode(c Component) node {
 	attrs := map[string]string{
-		"label": "<FONT POINT-SIZE=\"14\"><B>" + c.Name + "</B></FONT><BR/>[Component]<BR/><BR/>" +
+		"label": "<FONT POINT-SIZE=\"14\"><B>" + c.Name + "</B></FONT><BR/>" +
+			nodeTechnology("Component", c.Technology) + "<BR/><BR/>" +
 			wrapWords(c.Description, lineLimit),
 		"fillcolor": componentColor,
 		"color":     componentBorderColor,
@@ -169,7 +172,8 @@ func componentNode(c Component) node {
 
 func personaNode(p Persona) node {
 	attrs := map[string]string{
-		"label": "<FONT POINT-SIZE=\"14\"><B>" + p.Name + "</B></FONT><BR/>[Person]<BR/><BR/>" +
+		"label": "<FONT POINT-SIZE=\"14\"><B>" + p.Name + "</B></FONT><BR/>" +
+			"[Persona]<BR/><BR/>" +
 			wrapWords(p.Description, lineLimit),
 		"fillcolor": personColor,
 		"color":     personBorderColor,
@@ -185,10 +189,17 @@ func relationshipEdge(r Relationship) edge {
 }
 
 func edgeTechnology(r Relationship) string {
-	if len(r.Technology) == 0 {
+	if r.Technology == "" {
 		return ""
 	}
 	return "<BR/>[" + wrapWords(r.Technology, lineLimit) + "]"
+}
+
+func nodeTechnology(nodeKind, technology string) string {
+	if technology == "" {
+		return "[" + nodeKind + "]"
+	}
+	return "[" + wrapWords(nodeKind+": "+technology, lineLimit) + "]"
 }
 
 func relationshipEdges(rs ...Relationship) []edge {
