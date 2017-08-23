@@ -16,39 +16,30 @@ import (
 
 const dotTemplate = `
 digraph "{{.Title}}" {
-	ranksep="1.5 equally";
-	nodesep="1.5 equally";
+	ranksep="1.0";
+	nodesep="1.0";
 	node[fontcolor="white" fontsize=11 fontname="Sans" shape="box" style="filled,rounded" margin="0.20,0.20"];
 	edge[fontcolor="dimgrey" color="dimgrey" fontsize=11 fontname="Sans"];
 
 	subgraph cluster_core {
 		color="#7b7b7b";
 		style="dashed,rounded,bold";
-		"__core__" [label="" style="invis" fixedsize="true" height="0.01" width="0.01"];
 		{{- range .CoreNodes}}
 		"{{.Name}}" [{{range $k, $v := .Attrs}} {{$k}}=<{{$v}}>{{end}} ];
 		{{- end}}
 	}
 
-	// Fake edges to ensure cluster ranks
-	"__top__" -> "__core__" -> "__bottom__" [style="invis"];
-	{{- range .CoreNodes}}
-	"__top__" -> "{{.Name}}" -> "__bottom__" [style="invis"];
-	{{- end}}
-
 	subgraph cluster_top {
-		rank="min,same";
+		rank="sink";
 		style="invis";
-		"__top__" [label="" style="invis" fixedsize="true" height="0.01" width="0.01"];
 		{{- range .TopNodes}}
 		"{{.Name}}" [{{range $k, $v := .Attrs}} {{$k}}=<{{$v}}>{{end}} ];
 		{{- end}}
 	}
 
 	subgraph cluster_bottom {
-		rank="max,same";
+		rank="source";
 		style="invis";
-		"__bottom__" [label="" style="invis" fixedsize="true" height="0.01" width="0.01"];
 		{{- range .BottomNodes}}
 		"{{.Name}}" [{{range $k, $v := .Attrs}} {{$k}}=<{{$v}}>{{end}} ];
 		{{- end}}
@@ -159,6 +150,17 @@ func (v componentView) dot(w io.Writer, model Model) error {
 	}
 
 	edges = append(edges, relationshipEdges(model.FindRelationships(names)...)...)
+
+	// invert edges to top nodes to get ranking right
+	for i, edge := range edges {
+		if _, ok := model.Containers[edge.Destination]; ok {
+			src := edge.Source
+			edge.Source = edge.Destination
+			edge.Destination = src
+			edge.Attrs["dir"] = "back"
+			edges[i] = edge
+		}
+	}
 
 	return genDot(w, graph{Title: v.title, CoreNodes: coreNodes, TopNodes: topNodes, BottomNodes: bottomNodes, Edges: edges})
 }

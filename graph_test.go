@@ -12,35 +12,27 @@ import (
 
 const expectedGenDot = `
 digraph "Test Title" {
-	ranksep="1.5 equally";
-	nodesep="1.5 equally";
+	ranksep="1.0";
+	nodesep="1.0";
 	node[fontcolor="white" fontsize=11 fontname="Sans" shape="box" style="filled,rounded" margin="0.20,0.20"];
 	edge[fontcolor="dimgrey" color="dimgrey" fontsize=11 fontname="Sans"];
 
 	subgraph cluster_core {
 		color="#7b7b7b";
 		style="dashed,rounded,bold";
-		"__core__" [label="" style="invis" fixedsize="true" height="0.01" width="0.01"];
 		"N1" [ label=<N1 Label> style=<filled> ];
 		"N2" [ ];
 	}
 
-	// Fake edges to ensure cluster ranks
-	"__top__" -> "__core__" -> "__bottom__" [style="invis"];
-	"__top__" -> "N1" -> "__bottom__" [style="invis"];
-	"__top__" -> "N2" -> "__bottom__" [style="invis"];
-
 	subgraph cluster_top {
-		rank="min,same";
+		rank="sink";
 		style="invis";
-		"__top__" [label="" style="invis" fixedsize="true" height="0.01" width="0.01"];
 		"N3" [ label=<N3 Label> ];
 	}
 
 	subgraph cluster_bottom {
-		rank="max,same";
+		rank="source";
 		style="invis";
-		"__bottom__" [label="" style="invis" fixedsize="true" height="0.01" width="0.01"];
 		"N4" [ label=<N4 Label> ];
 	}
 
