@@ -1,5 +1,6 @@
 Container = example.com Blog | Database | Stores user profiles and content | PostgresSQL 9.6 |
-Container = example.com Blog | Web App | Online user interaction: view and publish articles. | Go Server, static page generation |
+Container = example.com Blog | Web App | Online user interaction:\
+	view and publish articles.| Go Server, static page generation |
 
 Relationship = Author | Uses | HTTPS | Web App |
 Relationship = Reader | Uses | HTTPS | Web App |

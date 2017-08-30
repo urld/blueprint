@@ -25,7 +25,7 @@ running all the time:
 
 ![Example](https://github.com/urld/blueprint/blob/master/test/example.png)
 
-### Syntax 
+### Syntax
 
 A project directory can contain multiple textfiles
 containing an architecture description of the following syntax (currently similar to [structurizr express](https://structurizr.com/express)):
@@ -41,9 +41,13 @@ containing an architecture description of the following syntax (currently simila
 
 `Tags`, `CoreSystems` and `ExternalSystems` accept comma separated lists of values.
 
-An example can be found within `test/ok`.
+To span elements across multiple lines, the lines have to end with `\`:
 
+	Persona = Somebody \
+	        | does something \
+	        | some tag
 
+A complete example including all possible elements can be found within `test/ok`.
 
 
 ## TODO

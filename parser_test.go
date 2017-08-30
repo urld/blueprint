@@ -6,8 +6,10 @@
 package blueprint
 
 import (
+	"bufio"
 	"fmt"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -56,6 +58,16 @@ func TestParseSystemDuplicate(t *testing.T) {
 	sys := m.Systems["Test System"]
 	expectedSys := System{Name: "Test System", Description: "Test Description", Tags: []string{"tag1", "tag2"}}
 	assertEqual(t, sys, expectedSys, "system content does not match")
+}
+
+func TestParseMultiLineSystem(t *testing.T) {
+	rawValue := " Test System | Test Description spans\\\n multiple \\\nlines | tag1,tag2\nother line"
+	s := bufio.NewScanner(strings.NewReader(rawValue))
+	s.Scan()
+	value, lineCnt := parseLine(s)
+	expectedValue := "Test System | Test Description spans multiple lines | tag1,tag2"
+	assertEqual(t, value, expectedValue, "multiline system text does not match")
+	assertEqual(t, lineCnt, 3, "lineCnt of multiline system does not match")
 }
 
 func assertEqual(t *testing.T, a, b interface{}, message string) {

@@ -44,6 +44,24 @@ func Parse(path string) (Model, error) {
 	return *m, err
 }
 
+func parseLine(s *bufio.Scanner) (string, int) {
+	text := strings.TrimSpace(s.Text())
+	lineCnt := 1
+	if !strings.HasSuffix(text, "\\") {
+		return text, lineCnt
+	}
+
+	for s.Scan() {
+		text = strings.TrimSuffix(text, "\\")
+		text = strings.TrimSpace(text) + " " + strings.TrimSpace(s.Text())
+		lineCnt++
+		if !strings.HasSuffix(text, "\\") {
+			return text, lineCnt
+		}
+	}
+	return text, lineCnt
+}
+
 func parseFile(path string, m *Model) error {
 	file, err := os.Open(path)
 	if err != nil {
@@ -53,7 +71,7 @@ func parseFile(path string, m *Model) error {
 	lineno := 0
 	s := bufio.NewScanner(file)
 	for s.Scan() {
-		line := strings.TrimSpace(s.Text())
+		line, lineCnt := parseLine(s)
 		lineno++
 		if line == "" {
 			continue
@@ -83,6 +101,10 @@ func parseFile(path string, m *Model) error {
 			m.addErr(path, lineno, "unknown keyword: "+key)
 		}
 
+		// lineno in error messages should always point to the first
+		// line of an element. Therefore we add line count of
+		// parseLine after parsing of the element has finished.
+		lineno += lineCnt - 1
 	}
 
 	return nil
