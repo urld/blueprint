@@ -3,12 +3,14 @@ Persona = Author | Someone who publishes is own articles on the blog. |
 Persona = Reader | Someone who reads articles on the blog. |
 Persona = Moderator | An administrator who manages inapropriate content. |
 
+# core system:
 System = example.com Blog | An innovative blog. Everyone can publish their articles. |
 
 Relationship = Author | Publishes Articles | | example.com Blog |
 Relationship = Reader | Reads Articles | | example.com Blog |
 Relationship = Moderator | Reviews content | | example.com Blog |
 
+# external systems:
 System = Hackernews | |
 
 Relationship = example.com Blog | Share relevant articles with news aggregator | HTTP/REST | Hackernews |

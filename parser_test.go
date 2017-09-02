@@ -70,6 +70,15 @@ func TestParseMultiLineSystem(t *testing.T) {
 	assertEqual(t, lineCnt, 3, "lineCnt of multiline system does not match")
 }
 
+func TestParseCommentLine(t *testing.T) {
+	rawValue := "  # this is a comment"
+	s := bufio.NewScanner(strings.NewReader(rawValue))
+	s.Scan()
+	value, lineCnt := parseLine(s)
+	assertEqual(t, value, "", "comment line value does not match")
+	assertEqual(t, lineCnt, 1, "lineCnt of multiline system does not match")
+}
+
 func assertEqual(t *testing.T, a, b interface{}, message string) {
 	if reflect.DeepEqual(a, b) {
 		return

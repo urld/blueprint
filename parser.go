@@ -47,6 +47,9 @@ func Parse(path string) (Model, error) {
 func parseLine(s *bufio.Scanner) (string, int) {
 	text := strings.TrimSpace(s.Text())
 	lineCnt := 1
+	if strings.HasPrefix(text, "#") {
+		return "", lineCnt
+	}
 	if !strings.HasSuffix(text, "\\") {
 		return text, lineCnt
 	}
@@ -72,8 +75,8 @@ func parseFile(path string, m *Model) error {
 	s := bufio.NewScanner(file)
 	for s.Scan() {
 		line, lineCnt := parseLine(s)
-		lineno++
 		if line == "" {
+			lineno += lineCnt - 1
 			continue
 		}
 

@@ -47,6 +47,8 @@ To span elements across multiple lines, the lines have to end with `\`:
 	        | does something \
 	        | some tag
 
+Lines beginning with `#` are ignored as comments.
+
 A complete example including all possible elements can be found within `test/ok`.
 
 
