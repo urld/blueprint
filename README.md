@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/urld/blueprint.svg?branch=master)](https://travis-ci.org/urld/blueprint)
 [![Go Report Card](https://goreportcard.com/badge/github.com/urld/blueprint)](https://goreportcard.com/report/github.com/urld/blueprint)
 [![GoDoc](https://godoc.org/github.com/urld/blueprint?status.svg)](https://godoc.org/github.com/urld/blueprint)
+[![GitHub release](https://img.shields.io/github/release/urld/blueprint.svg)](https://github.com/urld/blueprint/releases/latest)
 
 `blueprint` is a tool to document and visualize your software architecture, based on the [C4 software architecture model](https://c4model.com).
 
